@@ -1,0 +1,9 @@
+{
+  "name": "@yurkimus/enumeration",
+  "version": "0.0.0",
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": true
+  },
+  "exports": "./source/index.js"
+}
