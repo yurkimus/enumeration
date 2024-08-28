@@ -1,4 +1,4 @@
-# Functions
+# Enumeration
 
 Enumeration implementation to use with javascript.
 
