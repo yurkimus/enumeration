@@ -97,7 +97,8 @@ enumeration.get('Get') // => 'GET'
 enumeration.get('GET') // => 'Get'
 
 // Create new Enumeration based on derived keys
-enumeration.bindKeys(0, 1, 2) // => Enumeration { 0 => 'GET', 'GET' => 0, ... }
+enumeration
+  .bindKeys(0, 1, 2) // => Enumeration { 0 => 'GET', 'GET' => 0, ... }
 
 // Create new Enumeration based on derived values
 enumeration.bindValues('a', 'b', 'c') // => Enumeration { 'Get' => 'a', 'a' => 'Get', ... }
@@ -125,6 +126,11 @@ enumeration.entries() // => Iterator { ... }
 [...enumeration.entries()]
 
 Array.from(enumeration.entries())
+
+// Shorthand form (keys equals to values)
+new Enumeration([
+  ['Red', 'Green', 'Blue']
+]) // => Enumeration { 'Red' => 'Red', ... }
 ```
 
 ## License

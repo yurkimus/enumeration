@@ -26,16 +26,33 @@ export function Enumeration(...parameters) {
         }
 
         case 'Array': {
-          if (
-            !(parameters[0].every(Array.isArray) && parameters[0].length === 2)
-          ) {
+          if (!(parameters[0].every(Array.isArray))) {
             throw new TypeError(
-              `Expected array initializer to contain keys and values arrays`,
+              `Expected array initializer elements to be of type Array`,
             )
           }
 
-          for (var index in parameters[0][0]) {
-            this.add(parameters[0][0][index], parameters[0][1][index])
+          switch (parameters[0].length) {
+            case 1: {
+              for (var index in parameters[0][0]) {
+                this.add(parameters[0][0][index], parameters[0][0][index])
+              }
+
+              break
+            }
+
+            case 2: {
+              for (var index in parameters[0][0]) {
+                this.add(parameters[0][0][index], parameters[0][1][index])
+              }
+
+              break
+            }
+
+            default:
+              throw new TypeError(
+                `Expected array initializer to have 1 or 2 arrays`,
+              )
           }
 
           break
