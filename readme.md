@@ -18,7 +18,7 @@ var HttpMethodLogs = HttpMethods.bindValues(
   (...parameters) => console.log('This is "POST"'),
 )
 
-var request = new Request('http://localhost').method
+var request = new Request('http://localhost')
 
 var log = HttpMethodLogs.get(HttpMethods.get(request.method))
 
@@ -88,11 +88,11 @@ enumeration
   .add('Post', 'POST')
   .add('Patch', 'PATCH')
 
-// Check on presence
+// Check value on presence
 enumeration.has('Patch') // => true
 enumeration.has('PATCH') // => true
 
-// Get a related value assigned to a key or value
+// Get a related value assigned to a key or a value
 enumeration.get('Get') // => 'GET'
 enumeration.get('GET') // => 'Get'
 

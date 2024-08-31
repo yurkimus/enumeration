@@ -58,7 +58,9 @@ export function Enumeration(...parameters) {
       break
 
     default:
-      throw new TypeError(`Expected Enumeration init to have 0 or 1 argument`)
+      throw new TypeError(
+        `Expected Enumeration "parameters" to have 0 or 1 argument`,
+      )
   }
 }
 
