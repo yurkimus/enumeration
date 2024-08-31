@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "@yurkimus/enumeration",
   "author": {
     "name": "yurkimus",
@@ -10,8 +10,5 @@
     "type": "git",
     "url": "https://github.com/yurkimus/enumeration.git"
   },
-  "exports": "./source/index.js",
-  "dependencies": {
-    "@yurkimus/types": "@yurkimus/types"
-  }
+  "exports": "./source/index.js"
 }
