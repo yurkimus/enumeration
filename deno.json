@@ -1,6 +1,6 @@
 {
   "name": "@yurkimus/enumeration",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "fmt": {
     "semiColons": false,
     "singleQuote": true

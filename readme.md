@@ -38,7 +38,9 @@ npm install @yurkimus/enumeration
 #### Definition
 
 ```
-Enumeration :: () -> Enumeration
+Enumeration :: () -> Enumeration { }
+Enumeration :: { [key]: <value> } -> Enumeration { key <=> value }
+Enumeration :: [ keys: [], values: [] ] -> Enumeration { key <=> value }
 ```
 
 #### Example
@@ -46,28 +48,26 @@ Enumeration :: () -> Enumeration
 ```javascript
 var enumeration = new Enumeration()
 
+enumeration = new Enumeration([[], []])
+
+enumeration = new Enumeration({})
+
 enumeration
   .add('Get', 'GET')
   .add('Post', 'POST')
   .add('Patch', 'PATCH')
 
-enumeration
-  .has('Patch') // => true
+enumeration.has('Patch') // => true
 
-enumeration
-  .has('PATCH') // => true
+enumeration.has('PATCH') // => true
 
-enumeration
-  .get('Get') // => 'GET'
+enumeration.get('Get') // => 'GET'
 
-enumeration
-  .get('GET') // => 'Get'
+enumeration.get('GET') // => 'Get'
 
-enumeration
-  .bindKeys(0, 1, 2) // => Enumeration { 0 => 'GET', 'GET' => 0, ... }
+enumeration.bindKeys(0, 1, 2) // => Enumeration { 0 => 'GET', 'GET' => 0, ... }
 
-enumeration
-  .bindValues('a', 'b', 'c') // => Enumeration { 'Get' => 'a', 'a' => 'Get', ... }
+enumeration.bindValues('a', 'b', 'c') // => Enumeration { 'Get' => 'a', 'a' => 'Get', ... }
 ```
 
 ## License
