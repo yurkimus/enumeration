@@ -1,6 +1,29 @@
-# Enumeration
+# Enumeration prototype
 
-Enumeration implementation for javascript.
+JavaScript's Enumeration implementation
+
+Enumeration is a two-way bound collection of keys related to values and values
+to keys.
+
+Example:
+
+```javascript
+var HttpMethods = new Enumeration([
+  ['Get', 'GET'],
+  ['Post', 'POST'],
+])
+
+var HttpMethodLogs = HttpMethods.bindValues(
+  (...parameters) => console.log('This is "GET"'),
+  (...parameters) => console.log('This is "POST"'),
+)
+
+var request = new Request('http://localhost').method
+
+var log = HttpMethodLogs.get(HttpMethods.get(request.method))
+
+log(...[]) // => 'This is "GET"'
+```
 
 ## Table of Contents
 

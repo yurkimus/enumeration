@@ -107,7 +107,7 @@ Enumeration.prototype.bindKeys = function (...keys) {
     enumeration = new Enumeration()
 
   for (var index in values) {
-    enumeration.set(keys[index], values[index])
+    enumeration.add(keys[index], values[index])
   }
 
   return enumeration
@@ -124,7 +124,7 @@ Enumeration.prototype.bindValues = function (...values) {
     enumeration = new Enumeration()
 
   for (var index in values) {
-    enumeration.set(keys[index], values[index])
+    enumeration.add(keys[index], values[index])
   }
 
   return enumeration
