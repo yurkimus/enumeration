@@ -124,4 +124,20 @@ Enumeration.prototype.bindValues = function (...values) {
   return enumeration
 }
 
+Enumeration.prototype.keys = function* () {
+  yield* this[Symbols.Keys].keys()
+}
+
+Enumeration.prototype.values = function* () {
+  yield* this[Symbols.Values].keys()
+}
+
+Enumeration.prototype.entries = function* () {
+  yield* this[Symbols.Entries].entries()
+}
+
+Enumeration.prototype[Symbol.iterator] = function () {
+  return this[Symbols.Entries][Symbol.iterator]()
+}
+
 Enumeration.prototype[Symbol.toStringTag] = 'Enumeration'
