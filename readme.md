@@ -1,6 +1,6 @@
 # Enumeration
 
-Enumeration implementation to use with javascript.
+Enumeration implementation for javascript.
 
 ## Table of Contents
 
@@ -38,37 +38,36 @@ npm install @yurkimus/enumeration
 #### Definition
 
 ```
-Enumeration :: Enumeration -> Enumeration
-Enumeration :: any[] -> Enumeration
-Enumeration :: any[] -> any[] -> Enumeration
+Enumeration :: () -> Enumeration
 ```
 
 #### Example
 
 ```javascript
-new Enumeration(['a', 'b']) // => Enumeration { 'a' => 'a', 'b' => 'b' }
+var enumeration = new Enumeration()
 
-Enumeration.of([0, 1]) // => Enumeration { 0 => 0, 1 => 1 }
+enumeration
+  .add('Get', 'GET')
+  .add('Post', 'POST')
+  .add('Patch', 'PATCH')
 
-new Enumeration([0, 1]).has(1) // => true
+enumeration
+  .has('Patch') // => true
 
-new Enumeration([0, 1]).get(1) // => 1
+enumeration
+  .has('PATCH') // => true
 
-new Enumeration([0, 1], ['a', 'b']).get('a') // => 1
+enumeration
+  .get('Get') // => 'GET'
 
-new Enumeration([0, 1], ['a', 'b']).get(1) // => 'a'
+enumeration
+  .get('GET') // => 'Get'
 
-new Enumeration(['a', 'b']).bindKeys([0, 1]) // => Enumeration { 0 => 'a', 1 => 'b', 'a' => 0, 'b' => 1 }
+enumeration
+  .bindKeys(0, 1, 2) // => Enumeration { 0 => 'GET', 'GET' => 0, ... }
 
-new Enumeration([0, 1]).bindValues(['a', 'b']) // => Enumeration { 0 => 'a', 1 => 'b', 'a' => 0, 'b' => 1 }
-
-Array.from(Enumeration.of([0, 1]).keys()) // => [0, 1]
-
-Array.from(Enumeration.of([0, 1], ['a', 'b']).values()) // => ['a', 'b']
-
-Array.from(Enumeration.of([0, 1], ['a', 'b']).entries()) // => [ [0, 'a'], ['a', 0], [1, 'b'], ['b', 1] ]
-
-[...new Enumeration([0, 1], ['a', 'b'])] // => [ [0, 'a'], ['a', 0], [1, 'b'], ['b', 1] ]
+enumeration
+  .bindValues('a', 'b', 'c') // => Enumeration { 'Get' => 'a', 'a' => 'Get', ... }
 ```
 
 ## License

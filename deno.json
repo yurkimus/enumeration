@@ -5,5 +5,9 @@
     "semiColons": false,
     "singleQuote": true
   },
-  "exports": "./source/index.js"
+  "exports": "./source/index.js",
+  "imports": {
+    "@yurkimus/curry": "https://raw.githubusercontent.com/yurkimus/curry/main/source/index.js",
+    "@yurkimus/types": "https://raw.githubusercontent.com/yurkimus/types/main/source/index.js"
+  }
 }
