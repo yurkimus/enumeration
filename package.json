@@ -10,5 +10,9 @@
     "type": "git",
     "url": "https://github.com/yurkimus/enumeration.git"
   },
-  "exports": "./source/index.js"
+  "exports": "./source/index.js",
+  "dependencies": {
+    "@yurkimus/curry": "@yurkimus/curry",
+    "@yurkimus/types": "@yurkimus/types"
+  }
 }
