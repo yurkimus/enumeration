@@ -1,4 +1,4 @@
-# Enumeration prototype
+# Enumeration Prototype
 
 JavaScript's Enumeration implementation
 
