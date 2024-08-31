@@ -9,8 +9,8 @@ Example:
 
 ```javascript
 var HttpMethods = new Enumeration([
-  ['Get', 'GET'],
-  ['Post', 'POST'],
+  ['Get', 'Post'],
+  ['GET', 'POST'],
 ])
 
 var HttpMethodLogs = HttpMethods.bindValues(
