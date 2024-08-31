@@ -17,14 +17,15 @@ export function Enumeration(...init) {
 
     case 1:
       switch (type(init[0])) {
-        case 'Object':
+        case 'Object': {
           for (var key in init[0]) {
             this.add(key, init[0][key])
           }
 
           break
+        }
 
-        case 'Array':
+        case 'Array': {
           if (!(init[0].every(Array.isArray) && init[0].length === 2)) {
             throw new TypeError(
               `Expected array initializer to contain keys and values arrays`,
@@ -36,6 +37,15 @@ export function Enumeration(...init) {
           }
 
           break
+        }
+
+        case 'Enumeration': {
+          this[Symbols.Keys] = new Set(init[0][Symbols.Keys])
+          this[Symbols.Values] = new Set(init[0][Symbols.Values])
+          this[Symbols.Entries] = new Map(init[0][Symbols.Entries])
+
+          break
+        }
 
         default:
           throw new TypeError(
