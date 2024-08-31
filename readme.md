@@ -46,28 +46,62 @@ Enumeration :: [ keys: [], values: [] ] -> Enumeration { key <=> value }
 #### Example
 
 ```javascript
+// Making instance
 var enumeration = new Enumeration()
-
-enumeration = new Enumeration([[], []])
 
 enumeration = new Enumeration({})
 
+enumeration = new Enumeration([[], []])
+
+enumeration = Enumeration.of()
+
+enumeration = Enumeration.of({})
+
+enumeration = Enumeration.of([[], []])
+
+// Assigning new key-value pairs
 enumeration
   .add('Get', 'GET')
   .add('Post', 'POST')
   .add('Patch', 'PATCH')
 
+// Check on presence
 enumeration.has('Patch') // => true
-
 enumeration.has('PATCH') // => true
 
+// Get a related value assigned to a key or value
 enumeration.get('Get') // => 'GET'
-
 enumeration.get('GET') // => 'Get'
 
+// Create new Enumeration based on derived keys
 enumeration.bindKeys(0, 1, 2) // => Enumeration { 0 => 'GET', 'GET' => 0, ... }
 
+// Create new Enumeration based on derived values
 enumeration.bindValues('a', 'b', 'c') // => Enumeration { 'Get' => 'a', 'a' => 'Get', ... }
+
+// Iterator protocol available
+[...enumeration]
+
+// Accesing all the keys
+enumeration.keys() // => Iterator { ... }
+
+[...enumeration.keys()]
+
+Array.from(enumeration.keys())
+
+// Accesing all the values
+enumeration.values() // => Iterator { ... }
+
+[...enumeration.values()]
+
+Array.from(enumeration.values())
+
+// Accesing all the entries
+enumeration.entries() // => Iterator { ... }
+
+[...enumeration.entries()]
+
+Array.from(enumeration.entries())
 ```
 
 ## License

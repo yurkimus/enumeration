@@ -6,50 +6,52 @@ var Symbols = {
   Entries: Symbol('entries'),
 }
 
-export function Enumeration(...init) {
+export function Enumeration(...parameters) {
   this[Symbols.Keys] = new Set()
   this[Symbols.Values] = new Set()
   this[Symbols.Entries] = new Map()
 
-  switch (init.length) {
+  switch (parameters.length) {
     case 0:
       break
 
     case 1:
-      switch (type(init[0])) {
+      switch (type(parameters[0])) {
         case 'Object': {
-          for (var key in init[0]) {
-            this.add(key, init[0][key])
+          for (var key in parameters[0]) {
+            this.add(key, parameters[0][key])
           }
 
           break
         }
 
         case 'Array': {
-          if (!(init[0].every(Array.isArray) && init[0].length === 2)) {
+          if (
+            !(parameters[0].every(Array.isArray) && parameters[0].length === 2)
+          ) {
             throw new TypeError(
               `Expected array initializer to contain keys and values arrays`,
             )
           }
 
-          for (var index in init[0][0]) {
-            this.add(init[0][0][index], init[0][1][index])
+          for (var index in parameters[0][0]) {
+            this.add(parameters[0][0][index], parameters[0][1][index])
           }
 
           break
         }
 
         case 'Enumeration': {
-          this[Symbols.Keys] = new Set(init[0][Symbols.Keys])
-          this[Symbols.Values] = new Set(init[0][Symbols.Values])
-          this[Symbols.Entries] = new Map(init[0][Symbols.Entries])
+          this[Symbols.Keys] = new Set(parameters[0][Symbols.Keys])
+          this[Symbols.Values] = new Set(parameters[0][Symbols.Values])
+          this[Symbols.Entries] = new Map(parameters[0][Symbols.Entries])
 
           break
         }
 
         default:
           throw new TypeError(
-            `Initializer of type "${type(init[0])}" is not supported`,
+            `Initializer of type "${type(parameters[0])}" is not supported`,
           )
       }
 
@@ -58,6 +60,10 @@ export function Enumeration(...init) {
     default:
       throw new TypeError(`Expected Enumeration init to have 0 or 1 argument`)
   }
+}
+
+Enumeration.of = function (...parameters) {
+  return new Enumeration(...parameters)
 }
 
 Enumeration.prototype.has = function (value) {
