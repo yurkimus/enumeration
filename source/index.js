@@ -1,49 +1,75 @@
-import { type } from '@yurkimus/types'
+import { is, type } from '@yurkimus/types'
 
 var Symbols = {
   Keys: Symbol('keys'),
   Values: Symbol('values'),
   Entries: Symbol('entries'),
+  AssociationKeys: Symbol('associationKeys'),
+  AssociationsEntries: Symbol('associationsEntries'),
 }
 
 export function Enumeration(...parameters) {
-  this[Symbols.Keys] = new Set()
-  this[Symbols.Values] = new Set()
-  this[Symbols.Entries] = new Map()
+  this[Symbols.Keys] =
+    this[Symbols.Values] =
+    this[Symbols.Entries] =
+    this[Symbols.AssociationKeys] =
+    this[Symbols.AssociationsEntries] =
+      null
 
   switch (parameters.length) {
-    case 0:
-      break
-
     case 1:
       switch (type(parameters[0])) {
-        case 'Object': {
-          for (var key in parameters[0]) {
-            this.add(key, parameters[0][key])
-          }
-
-          break
-        }
-
         case 'Array': {
-          if (!(parameters[0].every(Array.isArray))) {
+          let array = parameters[0]
+
+          if (!array.every(is('Array'))) {
             throw new TypeError(
-              `Expected array initializer elements to be of type Array`,
+              `Failed to construct 'Enumeration': Every entry of the array initializer must be an array.`,
             )
           }
 
-          switch (parameters[0].length) {
+          switch (array.length) {
             case 1: {
-              for (var index in parameters[0][0]) {
-                this.add(parameters[0][0][index], parameters[0][0][index])
+              let keys = array[0]
+
+              this[Symbols.Keys] = this[Symbols.Values] = new Set()
+              this[Symbols.Entries] = new Map()
+
+              for (let key of keys) {
+                this[Symbols.Keys]
+                  .add(key)
+
+                this[Symbols.Entries]
+                  .set(key, key)
               }
 
               break
             }
 
             case 2: {
-              for (var index in parameters[0][0]) {
-                this.add(parameters[0][0][index], parameters[0][1][index])
+              let keys = array[0],
+                values = array[1]
+
+              if (!(keys.length === values.length)) {
+                throw new TypeError(
+                  `Failed to construct 'Enumeration': When initializing enumeration with both keys and values, they related arrays have must the same length.`,
+                )
+              }
+
+              this[Symbols.Keys] = new Set()
+              this[Symbols.Values] = new Set()
+              this[Symbols.Entries] = new Map()
+
+              for (let index in keys) {
+                this[Symbols.Keys]
+                  .add(keys[index])
+
+                this[Symbols.Values]
+                  .add(values[index])
+
+                this[Symbols.Entries]
+                  .set(keys[index], values[index])
+                  .set(values[index], keys[index])
               }
 
               break
@@ -51,32 +77,86 @@ export function Enumeration(...parameters) {
 
             default:
               throw new TypeError(
-                `Expected array initializer to have 1 or 2 arrays`,
+                `Failed to construct 'Enumeration': Array initializer must have 1 or 2 entries of type array.`,
               )
           }
 
           break
         }
 
+        case 'Object': {
+          let object = parameters[0]
+
+          this[Symbols.Keys] = new Set()
+          this[Symbols.Values] = new Set()
+          this[Symbols.Entries] = new Map()
+
+          for (let property in object) {
+            this[Symbols.Keys]
+              .add(property)
+
+            this[Symbols.Values]
+              .add(object[property])
+
+            this[Symbols.Entries]
+              .set(property, object[property])
+              .set(object[property], property)
+          }
+
+          break
+        }
+
+        case 'Map': {
+          let map = parameters[0]
+
+          this[Symbols.Keys] = new Set()
+          this[Symbols.Values] = new Set()
+          this[Symbols.Entries] = new Map()
+
+          for (let [key, value] of map) {
+            this[Symbols.Keys]
+              .add(key)
+
+            this[Symbols.Values]
+              .add(value)
+
+            this[Symbols.Entries]
+              .set(key, value)
+              .set(value, key)
+          }
+
+          break
+        }
+
         case 'Enumeration': {
-          this[Symbols.Keys] = new Set(parameters[0][Symbols.Keys])
-          this[Symbols.Values] = new Set(parameters[0][Symbols.Values])
-          this[Symbols.Entries] = new Map(parameters[0][Symbols.Entries])
+          let enumeration = parameters[0]
+
+          this[Symbols.Keys] = new Set(enumeration[Symbols.Keys])
+          this[Symbols.Values] = new Set(enumeration[Symbols.Values])
+          this[Symbols.Entries] = new Map(enumeration[Symbols.Entries])
+
+          if (enumeration[Symbols.AssociationKeys]) {
+            this[Symbols.AssociationKeys] = new Set(
+              enumeration[Symbols.AssociationKeys],
+            )
+
+            this[Symbols.AssociationsEntries] = new Set(
+              enumeration[Symbols.AssociationsEntries],
+            )
+          }
 
           break
         }
 
         default:
-          throw new TypeError(
-            `Initializer of type "${type(parameters[0])}" is not supported`,
-          )
+          break
       }
 
       break
 
     default:
       throw new TypeError(
-        `Expected Enumeration "parameters" to have 0 or 1 argument`,
+        `Failed to construct 'Enumeration': 1 or more arguments required, but ${parameters.length} present.`,
       )
   }
 }
@@ -85,84 +165,158 @@ Enumeration.of = function (...parameters) {
   return new Enumeration(...parameters)
 }
 
-Enumeration.prototype.has = function (value) {
-  return this[Symbols.Entries].has(value)
+Enumeration.prototype.has = function (proeprty) {
+  let symbols = [Symbols.Entries, Symbols.AssociationsEntries]
+
+  return symbols
+    .map((symbol) => this[symbol])
+    .some((map) => map?.has(proeprty))
 }
 
-Enumeration.prototype.get = function (value) {
-  return this[Symbols.Entries].get(value)
+Enumeration.prototype.get = function (property) {
+  if (this.has(property)) {
+    return new Map([
+      ...(this[Symbols.AssociationsEntries] ?? []),
+      ...this[Symbols.Entries],
+    ])
+      .get(property)
+  } else {
+    throw new ReferenceError(`Property '${property}' is not defined.`)
+  }
 }
 
-Enumeration.prototype.add = function (key, value) {
-  if (this[Symbols.Keys].has(key)) {
-    throw new TypeError('Expected "key" to be unique')
+Enumeration.prototype.bindKeys = function (keys) {
+  if (!is('Array', keys)) {
+    throw new TypeError(
+      "Provided 'keys' must be of type 'Array'",
+    )
   }
 
-  if (this[Symbols.Values].has(value)) {
-    throw new TypeError('Expected "value" to be unique')
+  if (!(keys.length === this[Symbols.Values].size)) {
+    throw new TypeError(
+      "Provided 'keys' must be the same length with derived 'values'",
+    )
   }
 
-  this[Symbols.Keys]
-    .add(key)
+  return new Enumeration([
+    keys,
+    Array.from(this[Symbols.Values]),
+  ])
+    .associateKeys(keys)
+}
 
-  this[Symbols.Values]
-    .add(value)
+Enumeration.prototype.bindValues = function (values) {
+  if (!is('Array', values)) {
+    throw new TypeError(
+      "Provided 'values' must be of type 'Array'",
+    )
+  }
 
-  this[Symbols.Entries]
-    .set(key, value)
-    .set(value, key)
+  if (this[Symbols.Keys].size !== values.length) {
+    throw new TypeError(
+      "Provided 'values' must be the same length with derived 'keys'",
+    )
+  }
+
+  let enumeration = new Enumeration([
+    Array.from(this[Symbols.Keys]),
+    values,
+  ])
+
+  if (this[Symbols.AssociationKeys]) {
+    enumeration
+      .associateKeys(Array.from(this[Symbols.AssociationKeys]))
+  }
+
+  return enumeration
+}
+
+Enumeration.prototype.associateKeys = function (parameter) {
+  switch (type(parameter)) {
+    case 'Array': {
+      if (!(this[Symbols.Keys].size === parameter.length)) {
+        throw new TypeError(
+          "Provided Array 'keys' must have the same length with derived 'keys'",
+        )
+      }
+
+      let values = Array.from(this[Symbols.Values])
+
+      if (!this[Symbols.AssociationKeys]) {
+        this[Symbols.AssociationKeys] = new Set()
+        this[Symbols.AssociationsEntries] = new Map()
+      }
+
+      for (let index in parameter) {
+        this[Symbols.AssociationKeys]
+          .add(parameter[index])
+
+        this[Symbols.AssociationsEntries]
+          .set(parameter[index], values[index])
+          .set(values[index], parameter[index])
+      }
+
+      break
+    }
+
+    case 'Enumeration': {
+      if (!(this[Symbols.Keys].size === parameter[Symbols.Keys].size)) {
+        throw new TypeError(
+          "Provided Enumeration 'keys' must have the same length with derived 'keys'",
+        )
+      }
+
+      let keys = Array.from(parameter[Symbols.Keys]),
+        associationKeys = Array.from(parameter[Symbols.AssociationKeys] ?? []),
+        values = Array.from(this[Symbols.Values])
+
+      if (!this[Symbols.AssociationKeys]) {
+        this[Symbols.AssociationKeys] = new Set()
+        this[Symbols.AssociationsEntries] = new Map()
+      }
+
+      for (let index in keys) {
+        this[Symbols.AssociationKeys]
+          .add(keys[index])
+
+        this[Symbols.AssociationsEntries]
+          .set(keys[index], values[index])
+          .set(values[index], keys[index])
+      }
+
+      for (let index in associationKeys) {
+        this[Symbols.AssociationKeys]
+          .add(associationKeys[index])
+
+        this[Symbols.AssociationsEntries]
+          .set(associationKeys[index], values[index])
+          .set(values[index], associationKeys[index])
+      }
+
+      break
+    }
+
+    default:
+      throw new TypeError(
+        `Failed keys association on 'Enumeration': required 1 argument of type 'Array' or 'Enumeration'`,
+      )
+  }
 
   return this
 }
 
-Enumeration.prototype.bindKeys = function (...keys) {
-  if (keys.length !== this[Symbols.Values].size) {
-    throw new TypeError(
-      "Expected provided 'keys' to be the same length with derived 'values'",
-    )
-  }
-
-  var values = Array.from(this[Symbols.Values]),
-    enumeration = new Enumeration()
-
-  for (var index in values) {
-    enumeration.add(keys[index], values[index])
-  }
-
-  return enumeration
-}
-
-Enumeration.prototype.bindValues = function (...values) {
-  if (this[Symbols.Keys].size !== values.length) {
-    throw new TypeError(
-      "Expected provided 'values' to be the same length with derived 'keys'",
-    )
-  }
-
-  var keys = Array.from(this[Symbols.Keys]),
-    enumeration = new Enumeration()
-
-  for (var index in values) {
-    enumeration.add(keys[index], values[index])
-  }
-
-  return enumeration
-}
-
 Enumeration.prototype.keys = function* () {
-  yield* this[Symbols.Keys].keys()
+  yield* this[Symbols.Keys][Symbol.iterator]()
 }
 
 Enumeration.prototype.values = function* () {
-  yield* this[Symbols.Values].keys()
+  yield* this[Symbols.Values][Symbol.iterator]()
 }
 
-Enumeration.prototype.entries = function* () {
-  yield* this[Symbols.Entries].entries()
-}
-
-Enumeration.prototype[Symbol.iterator] = function () {
-  return this[Symbols.Entries][Symbol.iterator]()
-}
+Enumeration.prototype.entries =
+  Enumeration.prototype[Symbol.iterator] =
+    function* () {
+      yield* this[Symbols.Entries][Symbol.iterator]()
+    }
 
 Enumeration.prototype[Symbol.toStringTag] = 'Enumeration'
